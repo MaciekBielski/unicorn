@@ -87,3 +87,9 @@ build/
 [Bb]in/
 [Oo]bj/
 packages/
+
+GPATH
+GRTAGS
+GSYMS
+GTAGS
+
