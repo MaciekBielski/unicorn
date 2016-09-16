@@ -20,7 +20,7 @@ SAMPLEDIR = .
 OBJDIR = .
 LIBDIR = ..
 
-CFLAGS += -Wall -I$(INCDIR)
+CFLAGS += -ggdb -Wall -I$(INCDIR)
 LDFLAGS += -lpthread -L$(LIBDIR) -l$(LIBNAME)
 LDFLAGS_STATIC += $(UNICORN_DEP_LIBS_STATIC)
 
@@ -178,3 +178,26 @@ endef
 define compile
 	${CC} ${CFLAGS} -c $< -o $@
 endef
+
+###############################################################
+llp = LD_LIBRARY_PATH=$(PWD)/..
+prog = sample_arm64
+gdbcmd = ./gdbscript
+
+define GDB_CMDS
+cat <<@ >$(gdbcmd)
+file $(prog)
+# handle SIGUSR1 nostop noprint pass
+br main
+run
+@
+endef
+export GDB_CMDS
+
+debug:
+	sh -c "$$GDB_CMDS" && \
+	$(llp) cgdb -dgdb -- -q -x $(gdbcmd)
+
+
+mrproper:
+	rm $(gdbcmd)
